@@ -1,5 +1,7 @@
 var Hapi = require('hapi')
-var server = Hapi.createServer('0.0.0.0', 9000)
+var server = Hapi.createServer('0.0.0.0', 9000, {
+	cors: true
+})
 
 // connect to db
 require('./db')
