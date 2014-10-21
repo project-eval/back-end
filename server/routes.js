@@ -1,3 +1,5 @@
+var _ = require('lodash')
+var validator = require('validator')
 var User = require('./models/user')
 
 module.exports = function (server) {
@@ -19,7 +21,6 @@ module.exports = function (server) {
 	/*
 	 * @route
 	 * @description register a new account
-	 * @todo validate payload
 	 */
 	server.route({
 		method: 'POST',
@@ -29,7 +30,10 @@ module.exports = function (server) {
 			var username = request.payload.username
 			var password = request.payload.password
 
-			//TODO validate payload
+			if(!validator.isLength(username, 4, 20) || !validator.isLength(password, 8, 100)) {
+				reply({error: 'invalid username of password'})
+				return
+			}
 
 			User.findOne({username: username}, function (err, user) {
 				if(err) console.log(err)
@@ -52,7 +56,6 @@ module.exports = function (server) {
 	/*
 	 * @route
 	 * @description validate account
-	 * @todo validate payload
 	 */
 	server.route({
 		method: 'POST',
@@ -62,7 +65,10 @@ module.exports = function (server) {
 			var username = request.payload.username
 			var password = request.payload.password
 
-			//TODO validate payload
+			if(!validator.isLength(username, 4, 20) || !validator.isLength(password, 8, 100)) {
+				reply({error: 'invalid username of password'})
+				return
+			}
 
 			User.findOne({username: username}, function (err, user) {
 				if(err) console.log(err)
