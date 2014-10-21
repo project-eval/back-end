@@ -21,12 +21,11 @@ module.exports = function (server) {
 
 			//TODO validate payload
 
-			var user = new User({
-				username: username,
-				password: password
-			})
+			var newUser = new User()
+			newUser.username = username
+			newUser.password = newUser.generateHash(password)
 
-			user.save(function (err, user) {
+			newUser.save(function (err, user) {
 				if(err) console.log(err)
 				reply({success: 'gj!'})
 			})
@@ -45,6 +44,7 @@ module.exports = function (server) {
 
 			User.findOne({username: username}, function (err, user) {
 				if(err) console.log(err)
+				if(user.isValidPassword(password)) console.log('succesfull login')
 				console.log(user)
 			})
 		}
