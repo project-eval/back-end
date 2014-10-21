@@ -49,4 +49,16 @@ module.exports = function (server) {
 			})
 		}
 	})
+
+	server.route({
+		method: 'POST',
+		path: '/breadsticks',
+		handler: function (request, reply) {
+
+			var start = request.payload.start
+			var end = request.payload.end
+
+			//TODO get breadsticks from 'start' to 'finish'
+		}
+	})
 }
