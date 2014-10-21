@@ -31,14 +31,20 @@ module.exports = function (server) {
 
 			//TODO validate payload
 
-			var newUser = new User()
-			newUser.username = username
-			newUser.password = newUser.generateHash(password)
-
-			newUser.save(function (err, user) {
+			User.findOne({username: username}, function (err, user) {
 				if(err) console.log(err)
-				else if(!user) reply({error: 'unknown'})
-				else reply({success: 'gj!'})
+				else if(user) reply({error: 'username already registered'})
+				else {
+					var newUser = new User()
+					newUser.username = username
+					newUser.password = newUser.generateHash(password)
+
+					newUser.save(function (err, user) {
+						if(err) console.log(err)
+						else if(!user) reply({error: 'unknown'})
+						else reply({success: 'gj!'})
+					})
+				}
 			})
 		}
 	})
