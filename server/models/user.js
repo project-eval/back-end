@@ -14,7 +14,7 @@ UserSchema.methods.generateHash = function (password) {
     return bcrypt.hashSync(password, bcrypt.genSaltSync(), null)
 }
 
-UserSchema.methods.generateHash = function (password) {
+UserSchema.methods.isValidPassword = function (password) {
     return bcrypt.compareSync(password, this.password)
 }
 
