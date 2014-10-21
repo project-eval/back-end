@@ -1,0 +1,21 @@
+{
+  "name": "back-end",
+  "description": "back-end",
+  "version": "0.0.0",
+  "author": "",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/olive-garden/back-end.git"
+  },
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon index.js"
+  },
+  "dependencies": {
+    "bcrypt": "^0.8.0",
+    "hapi": "^7.0.0",
+    "mongoose": "^3.8.17"
+  },
+  "devDependencies": {}
+}
