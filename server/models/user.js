@@ -2,12 +2,16 @@ var mongoose = require('mongoose')
 var bcrypt = require('bcrypt')
 
 var UserSchema = mongoose.Schema({
-    username  : String,
-    password  : String,
-    createdOn : Date,
+
+    email: String,
+    username: String,
+    password: String,
+    createdOn: Date,
+
+    points: Number,
 
     // TODO
-    breadsticks : [String]
+    breadsticks : [{id: String, hasCompleted: Boolean}]
 })
 
 UserSchema.methods.generateHash = function (password) {

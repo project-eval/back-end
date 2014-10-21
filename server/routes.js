@@ -44,7 +44,7 @@ module.exports = function (server) {
 
 			User.findOne({username: username}, function (err, user) {
 				if(err) console.log(err)
-				if(user.isValidPassword(password)) console.log('succesfull login')
+				if(user.isValidPassword(password)) reply({success: 'gj!'})
 				console.log(user)
 			})
 		}
