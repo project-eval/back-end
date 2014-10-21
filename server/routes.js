@@ -1,6 +1,7 @@
 var _ = require('lodash')
 var validator = require('validator')
 var User = require('./models/user')
+var BreadStick = require('./models/breadstick')
 
 module.exports = function (server) {
 
@@ -104,31 +105,62 @@ module.exports = function (server) {
 		}
 	})
 
+	// /*
+	//  * @route
+	//  * @api
+	//  */
+	// server.route({
+	// 	method: 'GET',
+	// 	path: '/api/breadsticks',
+	// 	handler: function (request, reply) {
+
+	// 		var from = request.query.from
+	// 		var to = request.query.to
+	// 		var sort = request.query.sort
+	// 		var language = request.query.language || 'javascript'
+
+	// 		BreadStick
+	// 			.find({ 'language': language })
+	// 			.limit(10)
+	// 			.sort(sort)
+	// 			.exec(function () {
+
+	// 			})
+
+	// 		reply(from + to + filter)
+	// 	}
+	// })
+
 	/*
 	 * @route
 	 * @api
+	 * @description create breadstick
 	 */
 	server.route({
 		method: 'POST',
 		path: '/api/breadsticks',
 		handler: function (request, reply) {
 
-			var start = request.payload.start
-			var end = request.payload.end
+			var source = request.payload.source
+			var language = request.payload.language
+			var difficulty = request.payload.difficulty
 
-			//TODO get breadsticks from 'start' to 'finish'
-		}
-	})
+			if(!source || !language || !difficulty) {
+				reply({error: 'source, language and difficulty are required params!'})
+				return
+			}
 
-	/*
-	 * @route
-	 * @api
-	 */
-	server.route({
-		method: 'GET',
-		path: '/api/breadstick',
-		handler: function (request, reply) {
+			var newBreadStick = new BreadStick({
+				source: source,
+			    language: language,
+			    difficulty: difficulty
+			})
 
+			newBreadStick.save(function (err, breadStick) {
+				if(err) console.log(err)
+				else if(!breadStick) reply({error: 'unknown'})
+				else reply({success: 'gj!'})
+			})
 		}
 	})
 

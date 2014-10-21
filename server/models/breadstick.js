@@ -2,6 +2,7 @@ var mongoose = require('mongoose')
 
 var BreadStickSchema = mongoose.Schema({
 
+	source: String,
     language: String,
     users: [{id: String, hasCompleted: Boolean}],
 
