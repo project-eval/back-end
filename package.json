@@ -15,6 +15,7 @@
   "dependencies": {
     "bcrypt": "^0.8.0",
     "hapi": "^7.0.0",
+    "hapi-auth-bearer-token": "^2.2.3",
     "mongoose": "^3.8.17"
   },
   "devDependencies": {}
