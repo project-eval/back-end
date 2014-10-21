@@ -105,31 +105,36 @@ module.exports = function (server) {
 		}
 	})
 
-	// /*
-	//  * @route
-	//  * @api
-	//  */
-	// server.route({
-	// 	method: 'GET',
-	// 	path: '/api/breadsticks',
-	// 	handler: function (request, reply) {
+	/*
+	 * @route
+	 * @api
+	 * @description query & get breadsticks
+	 */
+	server.route({
+		method: 'GET',
+		path: '/api/breadsticks',
+		handler: function (request, reply) {
 
-	// 		var from = request.query.from
-	// 		var to = request.query.to
-	// 		var sort = request.query.sort
-	// 		var language = request.query.language || 'javascript'
+			var query = _.extend({
+				from: 0,
+				to: 10,
+				sort: 'difficulty',
+				language: 'javascript'
+			}, request.query)
 
-	// 		BreadStick
-	// 			.find({ 'language': language })
-	// 			.limit(10)
-	// 			.sort(sort)
-	// 			.exec(function () {
-
-	// 			})
-
-	// 		reply(from + to + filter)
-	// 	}
-	// })
+			BreadStick
+				.find({ 'language': query.language })
+				.limit(query.to)
+				.sort(query.sort)
+				.exec(function (err, breadSticks) {
+					if(err) {
+						console.log(err)
+						reply({error: 'unknown'})
+					}
+					else reply(breadSticks)
+				})
+		}
+	})
 
 	/*
 	 * @route
