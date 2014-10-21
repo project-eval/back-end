@@ -1,4 +1,5 @@
 var Hapi = require('hapi')
+
 var server = Hapi.createServer('0.0.0.0', 9000, {
 	cors: true
 })

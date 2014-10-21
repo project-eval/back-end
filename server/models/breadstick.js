@@ -10,9 +10,9 @@ var BreadStickSchema = mongoose.Schema({
 
 	title: 		{type: String},
 	author: 	{type: Number, ref: 'User'},
-    language: 	{type: String},
-    difficulty: {type: Number},
-    points:     {type: Number, default: 0},
+	language: 	{type: String},
+	difficulty: {type: Number},
+	points:     {type: Number, default: 0},
 
     // users that have tried/completed
     users: 		[{

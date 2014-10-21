@@ -2,7 +2,6 @@ var User = require('./models/user')
 
 module.exports = function (server) {
 
-	// auth
 	server.pack.register(require('hapi-auth-bearer-token'), function (err) {
 
 	    server.auth.strategy('simple', 'bearer-access-token', {
