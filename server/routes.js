@@ -108,31 +108,33 @@ module.exports = function (server) {
 	/*
 	 * @route
 	 * @api
-	 * @description query & get breadsticks
+	 * @description query db for breadsticks
+	 *
+	 * @TODO add query count limit
+	 * @TODO refactor...
 	 */
 	server.route({
 		method: 'GET',
 		path: '/api/breadsticks',
 		handler: function (request, reply) {
 
-			var query = _.extend({
-				from: 0,
-				to: 10,
-				sort: 'difficulty',
-				language: 'javascript'
-			}, request.query)
+			var query = request.query
 
-			BreadStick
-				.find({ 'language': query.language })
-				.limit(query.to)
-				.sort(query.sort)
-				.exec(function (err, breadSticks) {
-					if(err) {
-						console.log(err)
-						reply({error: 'unknown'})
-					}
-					else reply(breadSticks)
-				})
+			var q = BreadStick.find()
+
+			if(query.language) q.where('language').equals(query.language)
+			if(query.sort) q.sort(query.sort)
+
+			q.skip(query.from || 0)
+			q.limit(query.to || 10)
+
+			q.exec(function (err, breadSticks) {
+				if(err) {
+					console.log(err)
+					reply({error: 'unknown'})
+				}
+				else reply(breadSticks)
+			})
 		}
 	})
 
