@@ -13,7 +13,6 @@ module.exports = function (server) {
 	server.route({
 		method: 'GET',
 		path: '/',
-		config: {auth: 'simple'},
 		handler: function (request, reply) {
 			reply('static file')
 		}
@@ -192,18 +191,23 @@ module.exports = function (server) {
 	server.route({
 		method: 'POST',
 		path: '/api/breadsticks',
+		config: {auth: 'simple'},
 		handler: function (request, reply) {
 
+			var author = request.auth.credentials._id
 			var source = request.payload.source
 			var language = request.payload.language
 			var difficulty = request.payload.difficulty
+			var title = request.payload.title
 
-			if(!source || !language || !difficulty) {
-				reply({error: 'source, language and difficulty are required params!'})
+			if(!source || !language || !difficulty || !title) {
+				reply({error: 'source, title, language and difficulty are required params!'})
 				return
 			}
 
 			var newBreadStick = new BreadStick({
+				title: title,
+				author: author,
 				source: source,
 			    language: language,
 			    difficulty: difficulty
