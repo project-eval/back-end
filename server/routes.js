@@ -14,7 +14,7 @@ module.exports = function (server) {
 		method: 'GET',
 		path: '/',
 		handler: function (request, reply) {
-			reply('static file')
+			reply('Hello').state('olive-garden-isAuth', request.auth.isAuthenticated)
 		}
 	})
 
