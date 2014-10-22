@@ -37,20 +37,29 @@ module.exports = function (server) {
 			}
 
 			User.findOne({username: username}, function (err, user) {
-				if(err) console.log(err)
-				else if(user) reply({error: 'username already registered'})
+				if(err) throw err
+
+				else if(user) {
+					reply({error: 'username already registered'})
+					return
+				}
+
 				else {
 					var newUser = new User()
 					newUser.username = username
 					newUser.password = newUser.generateHash(password)
 
 					newUser.save(function (err, user) {
-						if(err) console.log(err)
-						else if(!user) reply({error: 'unknown'})
-						else {
+						if(err) throw err
+
+						else if(user) {
 							request.auth.session.clear()
             				request.auth.session.set(user)
 							reply({success: 'gj!'})
+						}
+
+						else {
+							reply({error: unknown})
 						}
 					})
 				}
@@ -70,20 +79,32 @@ module.exports = function (server) {
 			var username = request.payload.username
 			var password = request.payload.password
 
-			if(!validator.isLength(username, 4, 20) || !validator.isLength(password, 8, 100)) {
-				reply({error: 'invalid username of password'})
+			if(!validator.isLength(username, 4, 20)) {
+				reply({error: 'invalid username length'})
+				return
+			}
+
+			if(!validator.isLength(password, 8, 100)) {
+				reply({error: 'invalid password length'})
 				return
 			}
 
 			User.findOne({username: username}, function (err, user) {
-				if(err) console.log(err)
-				else if(!user) reply({error: 'invalid username'})
+				if(err) throw err
+
+				else if(!user) {
+					reply({error: 'username does not exist'})
+				}
+
 				else if(user.isValidPassword(password)) {
 					request.auth.session.clear()
             		request.auth.session.set(user)
 					reply({success: 'gj!'})
 				}
-				else reply({error: 'wrong password'})
+
+				else {
+					reply({error: 'wrong password'})
+				}
 			})
 		}
 	})
@@ -96,7 +117,7 @@ module.exports = function (server) {
 		method: 'POST',
 		path: '/logout',
 		handler: function (request, reply) {
-			request.auth.session.clear()
+			if(request.auth.session) request.auth.session.clear()
 			reply({success: 'asd'})
 		}
 	})
@@ -116,12 +137,18 @@ module.exports = function (server) {
 			//TODO validate param
 
 			User.findOne({username: username}, function (err, user) {
-				if(err) console.log(err)
-				else if(user) reply({
-					username: user.username, 
-					points: user.points
-				})
-				else reply({error: 'user not found'})
+				if(err) throw err
+
+				else if(user) {
+					reply({
+						username: user.username, 
+						points: user.points
+					})
+				}
+
+				else {
+					reply({error: 'user not found'})
+				}
 			})
 		}
 	})
@@ -150,10 +177,8 @@ module.exports = function (server) {
 			q.limit(query.to || 10)
 
 			q.exec(function (err, breadSticks) {
-				if(err) {
-					console.log(err)
-					reply({error: 'unknown'})
-				}
+				if(err) throw err
+
 				else reply(breadSticks)
 			})
 		}
@@ -185,34 +210,16 @@ module.exports = function (server) {
 			})
 
 			newBreadStick.save(function (err, breadStick) {
-				if(err) console.log(err)
-				else if(!breadStick) reply({error: 'unknown'})
-				else reply({success: 'gj!'})
+				if(err) throw err
+
+				else if(breadStick) {
+					reply({success: 'gj!'})
+				}
+
+				else {
+					reply({error: 'unknown'})
+				}
 			})
-		}
-	})
-
-	/*
-	 * @route
-	 * @api
-	 */
-	server.route({
-		method: 'GET',
-		path: '/api/breadstickd',
-		handler: function (request, reply) {
-
-		}
-	})
-
-	/*
-	 * @route
-	 * @api
-	 */
-	server.route({
-		method: 'GET',
-		path: '/api/breadstickr',
-		handler: function (request, reply) {
-
 		}
 	})
 }

@@ -5,7 +5,7 @@ var db = mongoose.connection
 console.log('connecting to DB...')
 
 db.on('error', function (err) {
-	console.log(err)
+	throw err
 })
 db.once('open', function () {
     console.log('connected to DB.')
