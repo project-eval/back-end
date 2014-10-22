@@ -216,6 +216,33 @@ module.exports = function (server) {
 	/*
 	 * @route
 	 * @api
+	 * @description submit code to eval
+	 * @TODO
+	 */
+	server.route({
+	 	method: 'POST',
+	 	path: '/api/breadstick/{id}',
+	 	handler: function (request, reply) {
+
+	 		var id = request.params.id
+
+	 		BreadStick.findById(id, function (err, breadStick) {
+	 			if(err) throw err
+
+	 			else if(breadStick) {
+	 				// eval
+	 			}
+
+	 			else {
+	 				reply({error: 'unknown'})
+	 			}
+	 		})
+	 	}
+	})
+
+	/*
+	 * @route
+	 * @api
 	 * @description create breadstick
 	 */
 	server.route({
