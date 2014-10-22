@@ -13,10 +13,10 @@ module.exports = function (server) {
 	server.route({
 		method: 'GET',
 		path: '/',
+		config: {auth: 'simple'},
 		handler: function (request, reply) {
 			reply('static file')
-		},
-		config: {auth: 'simple'}
+		}
 	})
 
 	/*
@@ -47,7 +47,11 @@ module.exports = function (server) {
 					newUser.save(function (err, user) {
 						if(err) console.log(err)
 						else if(!user) reply({error: 'unknown'})
-						else reply({success: 'gj!'})
+						else {
+							request.auth.session.clear()
+            				request.auth.session.set(user)
+							reply({success: 'gj!'})
+						}
 					})
 				}
 			})
@@ -74,7 +78,11 @@ module.exports = function (server) {
 			User.findOne({username: username}, function (err, user) {
 				if(err) console.log(err)
 				else if(!user) reply({error: 'invalid username'})
-				else if(user.isValidPassword(password)) reply({success: 'gj!'})
+				else if(user.isValidPassword(password)) {
+					request.auth.session.clear()
+            		request.auth.session.set(user)
+					reply({success: 'gj!'})
+				}
 				else reply({error: 'wrong password'})
 			})
 		}
