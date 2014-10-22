@@ -88,6 +88,15 @@ module.exports = function (server) {
 		}
 	})
 
+	server.route({
+		method: 'POST',
+		path: '/logout',
+		handler: function (request, reply) {
+			request.auth.session.clear()
+			reply({success: 'asd'})
+		}
+	})
+
 	/*
 	 * @route
 	 * @api
