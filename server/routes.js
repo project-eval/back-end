@@ -186,6 +186,36 @@ module.exports = function (server) {
 	/*
 	 * @route
 	 * @api
+	 * @description get a single breadstick by id
+	 */
+	server.route({
+		method: 'GET',
+		path: '/api/breadstick/{id}',
+		handler: function (request, reply) {
+
+			var id = request.params.id
+
+			BreadStick.findById(id, function (err, breadStick) {
+				if(err) throw err
+
+				else if(breadStick) {
+					reply({success: breadStick})
+				}
+
+				else if(!breadStick) {
+					reply({error: 'breadStick not found'})
+				}
+
+				else {
+					reply({error: 'unknown'})
+				}
+			})
+		}
+	})
+
+	/*
+	 * @route
+	 * @api
 	 * @description create breadstick
 	 */
 	server.route({
