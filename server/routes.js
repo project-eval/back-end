@@ -60,7 +60,7 @@ module.exports = function (server) {
 
 	/*
 	 * @route
-	 * @description validate account
+	 * @description initiate session
 	 */
 	server.route({
 		method: 'POST',
@@ -88,6 +88,10 @@ module.exports = function (server) {
 		}
 	})
 
+	/*
+	 * @route
+	 * @description terminate session
+	 */
 	server.route({
 		method: 'POST',
 		path: '/logout',
