@@ -50,11 +50,10 @@ module.exports = function (server) {
 
 					newUser.save(function (err, user) {
 						if(err) throw err
-
 						else if(user) {
 							request.auth.session.clear()
             				request.auth.session.set(user)
-							reply({success: 'gj!'})
+							reply({success: {role: user.role, username: user.username}})
 						}
 
 						else {
@@ -98,7 +97,7 @@ module.exports = function (server) {
 				else if(user.isValidPassword(password)) {
 					request.auth.session.clear()
             		request.auth.session.set(user)
-					reply({success: 'gj!'})
+					reply({success: {role: user.role, username: user.username}})
 				}
 
 				else {
@@ -140,7 +139,7 @@ module.exports = function (server) {
 
 				else if(user) {
 					reply({
-						username: user.username, 
+						username: user.username,
 						points: user.points
 					})
 				}

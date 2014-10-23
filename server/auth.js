@@ -12,5 +12,4 @@ module.exports = function (server) {
 	        ttl : 60 * 1000 * 24
 	    })
 	})
-
 }
