@@ -13,6 +13,13 @@ require('./auth')(server)
 // import routes
 require('./routes')(server)
 
+// logger
+server.ext('onRequest', function (request, next) {
+	console.log(request.method.toUpperCase(), request.path)
+	console.log('params:', request.params, ' ~  payload:', request.payload)
+	next()
+})
+
 server.start(function () {
 	console.log('server started @', server.info.uri)
 })
