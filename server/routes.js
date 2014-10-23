@@ -24,7 +24,7 @@ module.exports = function (server) {
 	 */
 	server.route({
 		method: 'POST',
-		path: '/register',
+		path: '/api/register',
 		handler: function (request, reply) {
 
 			var username = request.payload.username
@@ -72,7 +72,7 @@ module.exports = function (server) {
 	 */
 	server.route({
 		method: 'POST',
-		path: '/login',
+		path: '/api/login',
 		handler: function (request, reply) {
 
 			var username = request.payload.username
@@ -114,7 +114,7 @@ module.exports = function (server) {
 	 */
 	server.route({
 		method: 'POST',
-		path: '/logout',
+		path: '/api/logout',
 		handler: function (request, reply) {
 			if(request.auth.session) request.auth.session.clear()
 			reply({success: 'asd'})
