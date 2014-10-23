@@ -11,7 +11,12 @@ var UserSchema = mongoose.Schema({
     password:   String,
     username:   String,
     createdOn:  {type: Date, default: Date.now},
-    role:       {type: Number, default: userRoles.user},
+
+    role:       {
+                    bitMask: {type: Number, default: userRoles.user.bitMask},
+                    title:   {type: String, default: userRoles.user.title}
+                },
+
     status:     {type: Number, default: 1},
 
     points:     {type: Number, default: 0},
