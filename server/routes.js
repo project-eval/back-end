@@ -141,7 +141,9 @@ module.exports = function (server) {
 				else if(user) {
 					reply({
 						username: user.username,
-						points: user.points
+						points: user.points,
+						createdOn: user.createdOn,
+						breadsticks: user.breadsticks
 					})
 				}
 
