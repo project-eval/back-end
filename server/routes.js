@@ -53,7 +53,7 @@ module.exports = function (server) {
 						if(err) throw err
 						else if(user) {
 							request.auth.session.clear()
-            				request.auth.session.set(user)
+							request.auth.session.set(user)
 							reply({success: {role: user.role, username: user.username}})
 						}
 
@@ -97,7 +97,7 @@ module.exports = function (server) {
 
 				else if(user.isValidPassword(password)) {
 					request.auth.session.clear()
-            		request.auth.session.set(user)
+					request.auth.session.set(user)
 					reply({success: {role: user.role, username: user.username}})
 				}
 
@@ -220,31 +220,44 @@ module.exports = function (server) {
 	 * @TODO
 	 */
 	server.route({
-	 	method: 'POST',
-	 	path: '/api/breadstick/{id}',
-	 	handler: function (request, reply) {
+		method: 'POST',
+		path: '/api/breadstick/{id}',
+		config: {auth: 'simple'},
+		handler: function (request, reply) {
 
-	 		var id = request.params.id
-	 		var code = request.payload.code
+			var id = request.params.id
+			var code = request.payload.code
 
-	 		if(!code) return reply({error: 'missing source code'})
+			if(!code) return reply({error: 'missing source code'})
 
-	 		BreadStick.findById(id, function (err, breadStick) {
-	 			if(err) throw err
+			BreadStick.findById(id, function (err, breadStick) {
+				if(err) throw err
 
-	 			else if(breadStick) {
-	 				coderunner(breadStick.language, code, function (err, output) {
-	 					if(err) return reply({error: err})
+				else if(breadStick) {
+					coderunner(breadStick.language, code, function (err, output) {
+						if(err) return reply({error: err})
 
-	 					else return reply({success: output})
-	 				})
-	 			}
+						User.findById(request.auth.credentials._id, 'breadsticks', function (err, user) {
 
-	 			else {
-	 				reply({error: 'unknown'})
-	 			}
-	 		})
-	 	}
+							var hasCompleted = false
+
+							var breadstick = _.find(user.breadsticks, function (brd) {return brd.id === id})
+							if(breadstick) breadstick.hasCompleted = hasCompleted
+							else user.breadsticks.push({id: id, hasCompleted: hasCompleted})
+
+							user.save()
+
+							return reply(output)
+
+						})
+					})
+				}
+
+				else {
+					reply({error: 'unknown'})
+				}
+			})
+		}
 	})
 
 	/*
@@ -273,8 +286,8 @@ module.exports = function (server) {
 				title: title,
 				author: author,
 				source: source,
-			    language: language,
-			    difficulty: difficulty
+				language: language,
+				difficulty: difficulty
 			})
 
 			newBreadStick.save(function (err, breadStick) {
