@@ -2,6 +2,7 @@ var _ = require('lodash')
 var validator = require('validator')
 var User = require('./models/user')
 var BreadStick = require('./models/breadstick')
+var coderunner = require('./coderunner')
 
 module.exports = function (server) {
 
@@ -224,12 +225,19 @@ module.exports = function (server) {
 	 	handler: function (request, reply) {
 
 	 		var id = request.params.id
+	 		var code = request.payload.code
+
+	 		if(!code) return reply({error: 'missing source code'})
 
 	 		BreadStick.findById(id, function (err, breadStick) {
 	 			if(err) throw err
 
 	 			else if(breadStick) {
-	 				// eval
+	 				coderunner(breadStick.language, code, function (err, output) {
+	 					if(err) return reply({error: err})
+
+	 					else return reply({success: output})
+	 				})
 	 			}
 
 	 			else {

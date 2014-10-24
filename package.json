@@ -19,6 +19,7 @@
     "lodash": "^2.4.1",
     "mongoose": "^3.8.17",
     "request": "^2.45.0",
+    "sandbox": "^0.8.6",
     "validator": "^3.22.0"
   },
   "devDependencies": {}
