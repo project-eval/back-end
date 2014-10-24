@@ -7,24 +7,24 @@ var userRoles = require('../routingConfig').userRoles
  */
 var UserSchema = mongoose.Schema({
 
-    email:      String,
-    password:   String,
-    username:   String,
-    createdOn:  {type: Date, default: Date.now},
+	email:      String,
+	password:   String,
+	username:   String,
+	createdOn:  {type: Date, default: Date.now},
 
-    role:       {
-                    bitMask: {type: Number, default: userRoles.user.bitMask},
-                    title:   {type: String, default: userRoles.user.title}
-                },
+	role:       {
+					bitMask: {type: Number, default: userRoles.user.bitMask},
+					title:   {type: String, default: userRoles.user.title}
+				},
 
-    status:     {type: Number, default: 1},
+	status:     {type: Number, default: 1},
 
-    points:     {type: Number, default: 0},
+	points:     {type: Number, default: 0},
 
-    breadsticks : [{
-        id: String,
-        hasCompleted: {type: Boolean, default: false}
-    }]
+	breadsticks : [{
+		id: String,
+		hasCompleted: {type: Boolean, default: false}
+	}]
 
 })
 
@@ -32,14 +32,14 @@ var UserSchema = mongoose.Schema({
  * @method
  */
 UserSchema.methods.generateHash = function (password) {
-    return bcrypt.hashSync(password, bcrypt.genSaltSync(), null)
+	return bcrypt.hashSync(password, bcrypt.genSaltSync(), null)
 }
 
 /**
  * @method
  */
 UserSchema.methods.isValidPassword = function (password) {
-    return bcrypt.compareSync(password, this.password)
+	return bcrypt.compareSync(password, this.password)
 }
 
 /**

@@ -239,12 +239,14 @@ module.exports = function (server) {
 
 						User.findById(request.auth.credentials._id, 'breadsticks', function (err, user) {
 
+							// this should be decided by testing submited code
 							var hasCompleted = false
 
+							// updates existing breadstick or creates new
+							// updates hasCompleted state
 							var breadstick = _.find(user.breadsticks, function (brd) {return brd.id === id})
 							if(breadstick) breadstick.hasCompleted = hasCompleted
 							else user.breadsticks.push({id: id, hasCompleted: hasCompleted})
-
 							user.save()
 
 							return reply(output)
