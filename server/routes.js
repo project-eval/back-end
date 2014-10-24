@@ -3,6 +3,7 @@ var validator = require('validator')
 var User = require('./models/user')
 var BreadStick = require('./models/breadstick')
 var coderunner = require('./coderunner')
+var Q = require('q')
 
 module.exports = function (server) {
 
@@ -21,7 +22,7 @@ module.exports = function (server) {
 
 	/*
 	 * @route
-	 * @description register a new account
+	 * account registration
 	 */
 	server.route({
 		method: 'POST',
@@ -31,9 +32,12 @@ module.exports = function (server) {
 			var username = request.payload.username
 			var password = request.payload.password
 
-			if(!validator.isLength(username, 4, 20) || !validator.isLength(password, 8, 100)) {
-				reply({error: 'invalid username of password'})
-				return
+			if(!validator.isLength(username, 4, 20)) {
+				return reply({error: 'invalid username length'})
+			}
+
+			if(!validator.isLength(password, 8, 100)) {
+				return reply({error: 'invalid password length'})
 			}
 
 			User.findOne({username: username}, function (err, user) {
@@ -51,6 +55,7 @@ module.exports = function (server) {
 
 					newUser.save(function (err, user) {
 						if(err) throw err
+
 						else if(user) {
 							request.auth.session.clear()
 							request.auth.session.set(user)
@@ -68,7 +73,7 @@ module.exports = function (server) {
 
 	/*
 	 * @route
-	 * @description initiate session
+	 * account authentication
 	 */
 	server.route({
 		method: 'POST',
@@ -79,30 +84,28 @@ module.exports = function (server) {
 			var password = request.payload.password
 
 			if(!validator.isLength(username, 4, 20)) {
-				reply({error: 'invalid username length'})
-				return
+				return reply({error: 'invalid username length'})
 			}
 
 			if(!validator.isLength(password, 8, 100)) {
-				reply({error: 'invalid password length'})
-				return
+				return reply({error: 'invalid password length'})
 			}
 
 			User.findOne({username: username}, function (err, user) {
 				if(err) throw err
 
 				else if(!user) {
-					reply({error: 'username does not exist'})
+					return reply({error: 'username does not exist'})
 				}
 
 				else if(user.isValidPassword(password)) {
 					request.auth.session.clear()
 					request.auth.session.set(user)
-					reply({success: {role: user.role, username: user.username}})
+					return reply({success: {role: user.role, username: user.username}})
 				}
 
 				else {
-					reply({error: 'wrong password'})
+					return reply({error: 'wrong password'})
 				}
 			})
 		}
@@ -110,7 +113,7 @@ module.exports = function (server) {
 
 	/*
 	 * @route
-	 * @description terminate session
+	 * terminate session
 	 */
 	server.route({
 		method: 'POST',
@@ -123,8 +126,7 @@ module.exports = function (server) {
 
 	/*
 	 * @route
-	 * @api
-	 * @description returns public information about an account
+	 * return public information about an account
 	 */
 	server.route({
 		method: 'GET',
@@ -132,8 +134,6 @@ module.exports = function (server) {
 		handler: function (request, reply) {
 
 			var username = request.params.username
-
-			//TODO validate param
 
 			User.findOne({username: username}, function (err, user) {
 				if(err) throw err
@@ -156,8 +156,7 @@ module.exports = function (server) {
 
 	/*
 	 * @route
-	 * @api
-	 * @description query db for breadsticks
+	 * query db for breadsticks
 	 *
 	 * @TODO add query count limit
 	 * @TODO refactor...
@@ -179,7 +178,6 @@ module.exports = function (server) {
 
 			q.exec(function (err, breadSticks) {
 				if(err) throw err
-
 				else reply(breadSticks)
 			})
 		}
@@ -187,8 +185,7 @@ module.exports = function (server) {
 
 	/*
 	 * @route
-	 * @api
-	 * @description get a single breadstick by id
+	 * get a single breadstick by id
 	 */
 	server.route({
 		method: 'GET',
@@ -217,9 +214,7 @@ module.exports = function (server) {
 
 	/*
 	 * @route
-	 * @api
-	 * @description submit code to eval
-	 * @TODO
+	 * submit code to eval
 	 */
 	server.route({
 		method: 'POST',
@@ -227,47 +222,40 @@ module.exports = function (server) {
 		config: {auth: 'simple'},
 		handler: function (request, reply) {
 
-			var id = request.params.id
+			var breadstick_id = request.params.id
+			var user_id = request.auth.credentials._id
 			var code = request.payload.code
 
-			if(!code) return reply({error: 'missing source code'})
+			return reply({error: 'TODO'})
 
-			BreadStick.findById(id, function (err, breadStick) {
-				if(err) throw err
+			// // $addToSet only pushes to array if item is unique
+			// User.update({_id: user_id}, {$addToSet:{breadsticks:[breadstick_id]}}, function (err) {
+			// 	if(err) throw err
+			// })
+			// BreadStick.update({_id: breadstick_id}, {$addToSet:{users:user_id}}, function (err) {
+			// 	if(err) throw err
+			// })
 
-				else if(breadStick) {
-					coderunner(breadStick.language, code, function (err, output) {
-						if(err) return reply({error: err})
+			// BreadStick.findById(breadstick_id, function (err, breadStick) {
+			// 	if(err) throw err
 
-						User.findById(request.auth.credentials._id, 'breadsticks', function (err, user) {
+			// 	else if(breadStick) {
+			// 		coderunner(breadStick.language, code, function (err, output) {
+			// 			if(err) return reply({error: err})
+			// 			else reply(output)
+			// 		})
+			// 	}
 
-							// this should be decided by testing submited code
-							var hasCompleted = false
-
-							// updates existing breadstick or creates new
-							// updates hasCompleted state
-							var breadstick = _.find(user.breadsticks, function (brd) {return brd.id === id})
-							if(breadstick) breadstick.hasCompleted = hasCompleted
-							else user.breadsticks.push({id: id, hasCompleted: hasCompleted})
-							user.save()
-
-							return reply(output)
-
-						})
-					})
-				}
-
-				else {
-					reply({error: 'unknown'})
-				}
-			})
+			// 	else {
+			// 		reply({error: 'unknown'})
+			// 	}
+			// })
 		}
 	})
 
 	/*
 	 * @route
-	 * @api
-	 * @description create breadstick
+	 * create breadstick
 	 */
 	server.route({
 		method: 'POST',

@@ -21,10 +21,7 @@ var UserSchema = mongoose.Schema({
 
 	points:     {type: Number, default: 0},
 
-	breadsticks : [{
-		id: String,
-		hasCompleted: {type: Boolean, default: false}
-	}]
+	breadsticks : [{type: Number, ref: 'BreadStick'}],
 
 })
 

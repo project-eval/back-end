@@ -15,10 +15,7 @@ var BreadStickSchema = mongoose.Schema({
 	points:     {type: Number, default: 0},
 
     // users that have tried/completed
-    users: 		[{
-    	id: {type: Number, ref: 'User'}, 
-    	hasCompleted: {type: Boolean, default: false}
-    }],
+    users: 		[{type: Number, ref: 'User'}],
 
     createdOn: 	{type: Date, default: Date.now}
 
