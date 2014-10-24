@@ -226,30 +226,28 @@ module.exports = function (server) {
 			var user_id = request.auth.credentials._id
 			var code = request.payload.code
 
-			return reply({error: 'TODO'})
+			// $addToSet only pushes to array if item is unique
+			User.update({_id: user_id}, {$addToSet:{breadsticks:breadstick_id}}, function (err) {
+				if(err) throw err
+			})
+			BreadStick.update({_id: breadstick_id}, {$addToSet:{users:user_id}}, function (err) {
+				if(err) throw err
+			})
 
-			// // $addToSet only pushes to array if item is unique
-			// User.update({_id: user_id}, {$addToSet:{breadsticks:[breadstick_id]}}, function (err) {
-			// 	if(err) throw err
-			// })
-			// BreadStick.update({_id: breadstick_id}, {$addToSet:{users:user_id}}, function (err) {
-			// 	if(err) throw err
-			// })
+			BreadStick.findById(breadstick_id, function (err, breadstick) {
+				if(err) throw err
 
-			// BreadStick.findById(breadstick_id, function (err, breadStick) {
-			// 	if(err) throw err
+				else if(breadstick) {
+					coderunner(breadstick.language, code, function (err, output) {
+						if(err) return reply({error: err})
+						else return reply(output)
+					})
+				}
 
-			// 	else if(breadStick) {
-			// 		coderunner(breadStick.language, code, function (err, output) {
-			// 			if(err) return reply({error: err})
-			// 			else reply(output)
-			// 		})
-			// 	}
-
-			// 	else {
-			// 		reply({error: 'unknown'})
-			// 	}
-			// })
+				else {
+					return reply({error: 'breadstick does not exist'})
+				}
+			})
 		}
 	})
 
