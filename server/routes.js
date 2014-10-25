@@ -265,15 +265,15 @@ module.exports = function (server) {
 			var source = request.payload.source
 			var language = request.payload.language
 			var difficulty = request.payload.difficulty
-			var title = request.payload.title
+			var name = request.payload.name
 
-			if(!source || !language || !difficulty || !title) {
-				reply({error: 'source, title, language and difficulty are required params!'})
+			if(!source || !language || !difficulty || !name) {
+				reply({error: 'source, name, language and difficulty are required params!'})
 				return
 			}
 
 			var newBreadStick = new BreadStick({
-				title: title,
+				name: name,
 				author: author,
 				source: source,
 				language: language,
@@ -291,6 +291,19 @@ module.exports = function (server) {
 					reply({error: 'unknown'})
 				}
 			})
+		}
+	})
+
+	/*
+	 * @route
+	 * update breadstick
+	 */
+	server.route({
+		method: 'PUT',
+		path: '/api/breadsticks',
+		config: {auth: 'simple'},
+		handler: function (request, reply) {
+			// update breadsticks
 		}
 	})
 }
