@@ -10,18 +10,17 @@ module.exports = function (server) {
 	/*
 	 * @route
 	 * @description serves client
-	 * @todo should handle all root GET paths
 	 */
 	server.route({
-		method: 'GET',
-		path: '/{param*}',
-	    handler: {
-	        directory: {
-	            path: 'front-end/build',
-	            listing: true,
-	            index: true
-	        }
-	    }
+	 	method: 'GET',
+	 	path: '/{param*}',
+	     handler: {
+	         directory: {
+	             path: 'front-end/build',
+	             listing: true,
+	             index: true
+	         }
+	     }
 	})
 
 	/*
