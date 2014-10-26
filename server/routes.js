@@ -339,6 +339,8 @@ module.exports = function (server) {
 			var id = request.payload.id
 			var update = request.payload.update
 
+			delete update._id
+
 			if(!update || !id) return reply({error: 'missing params'})
 
 			BreadStick.findOneAndUpdate({'_id': id}, request.payload.update, function (err) {
