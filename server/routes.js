@@ -19,7 +19,7 @@ module.exports = function (server) {
 	             path: 'front-end/build',
 	             listing: true,
 	             index: true
-	         }
+	         },
 	     }
 	})
 
@@ -71,6 +71,33 @@ module.exports = function (server) {
 					})
 				}
 			})
+		}
+	})
+	
+	/*
+	 * @route
+	 * recive info about your session
+	 */
+	server.route({
+		method: 'GET',
+		path: '/api/me',
+		handler: function (request, reply) {
+
+			if(!request.auth.isAuthenticated) {
+				reply({
+		      		username: 'o',
+		      		role: 'public'
+		    	})
+				return
+			}
+
+			else {
+				reply({
+			      username: request.auth.credentials.username,
+			      role: request.auth.credentials.role
+			    })
+			    return
+		   	}
 		}
 	})
 
@@ -173,6 +200,7 @@ module.exports = function (server) {
 
 			var q = BreadStick.find()
 
+			if(query.author) q.where('author').equals(query.author)
 			if(query.language) q.where('language').equals(query.language)
 			if(query.sort) q.sort(query.sort)
 
@@ -264,30 +292,31 @@ module.exports = function (server) {
 		config: {auth: 'simple'},
 		handler: function (request, reply) {
 
-			var author = request.auth.credentials._id
-			var source = request.payload.source
-			var language = request.payload.language
-			var difficulty = request.payload.difficulty
-			var name = request.payload.name
-
-			if(!source || !language || !difficulty || !name) {
-				reply({error: 'source, name, language and difficulty are required params!'})
-				return
-			}
+			var author = request.auth.credentials.username
 
 			var newBreadStick = new BreadStick({
-				name: name,
+				name: 'My breadstick',
 				author: author,
-				source: source,
-				language: language,
-				difficulty: difficulty
+				tags: ['comma', 'separated', 'tags'],
+				challenges: [
+					{
+						description: '#write your description for challenge #1 here! \n take advantage of the markdown!',
+						test: 'write your tests for challenge #1'
+					},
+					{
+						description: '#write your description for challenge #2 here! \n take advantage of the markdown!',
+						test: 'write your tests for challenge #2'
+					}
+				],
+				language: 'javascript',
+				difficulty: 0
 			})
 
 			newBreadStick.save(function (err, breadStick) {
 				if(err) throw err
 
 				else if(breadStick) {
-					reply({success: 'gj!'})
+					reply({success: 'breadStick created'})
 				}
 
 				else {
@@ -306,7 +335,16 @@ module.exports = function (server) {
 		path: '/api/breadsticks',
 		config: {auth: 'simple'},
 		handler: function (request, reply) {
-			// update breadsticks
+
+			var id = request.payload.id
+			var update = request.payload.update
+
+			if(!update || !id) return reply({error: 'missing params'})
+
+			BreadStick.findOneAndUpdate({'_id': id}, request.payload.update, function (err) {
+				if(err) throw err
+				else reply({success: 'gj!'})
+			})
 		}
 	})
 }

@@ -7,21 +7,21 @@ var BreadStickSchema = mongoose.Schema({
 
 	// description = markup
 	// tests = language specific tests
-	source: 	[{
+	challenges: [{
 		description: {type: String},
-		tests: {type: String}
+		test: {type: String}
 	}],
 
 	name: 		{type: String},
-	author: 	{type: String, ref: 'User'},
-	tags:       [String],
+	author: 	{type: String},
+	tags:       [{type: String}],
 	language: 	{type: String},
 	difficulty: {type: Number},
 
 	// number of 'likes'
 	points:     {type: Number, default: 0},
 
-	// 0 = pre-submission (editing stage)
+	// 0 = draft
 	// 1 = submittited for review
 	// 2 = aproved
 	// 3 = disaproved
