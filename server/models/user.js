@@ -1,6 +1,5 @@
 var mongoose = require('mongoose')
 var bcrypt = require('bcrypt')
-var userRoles = require('../routingConfig').userRoles
 
 /**
  * @schema
@@ -12,10 +11,7 @@ var UserSchema = mongoose.Schema({
 	username:   String,
 	createdOn:  {type: Date, default: Date.now},
 
-	role:       {
-					bitMask: {type: Number, default: userRoles.user.bitMask},
-					title:   {type: String, default: userRoles.user.title}
-				},
+	role:       {type: String, default: 'user'},
 
 	status:     {type: Number, default: 1},
 

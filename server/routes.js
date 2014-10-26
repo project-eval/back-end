@@ -14,10 +14,14 @@ module.exports = function (server) {
 	 */
 	server.route({
 		method: 'GET',
-		path: '/',
-		handler: function (request, reply) {
-			reply('Hello').state('olive-garden-isAuth', request.auth.isAuthenticated)
-		}
+		path: '/{param*}',
+	    handler: {
+	        directory: {
+	            path: 'front-end/build',
+	            listing: true,
+	            index: true
+	        }
+	    }
 	})
 
 	/*
@@ -59,7 +63,7 @@ module.exports = function (server) {
 						else if(user) {
 							request.auth.session.clear()
 							request.auth.session.set(user)
-							reply({success: {role: user.role, username: user.username}})
+							reply({success: {bitMask: user.bitMask, username: user.username}})
 						}
 
 						else {
