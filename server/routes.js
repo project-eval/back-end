@@ -13,10 +13,10 @@ module.exports = function (server) {
 	 */
 	server.route({
 		method: 'GET',
-		path: '/{param*}',
+		path: '/{path*}',
 		handler: {
 			directory: {
-				path: 'front-end/build',
+				path: './',
 				listing: true,
 				index: true
 			},
