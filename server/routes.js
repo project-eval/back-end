@@ -10,16 +10,13 @@ module.exports = function (server) {
 	/*
 	 * @route
 	 * serves client
+	 * https://github.com/hapijs/hapi/issues/800
 	 */
 	server.route({
 		method: 'GET',
 		path: '/{path*}',
 		handler: {
-			directory: {
-				path: './',
-				listing: true,
-				index: true
-			},
+			file: 'index.html'
 		}
 	})
 
