@@ -48,8 +48,8 @@ GET breadsticks?
 query for breadsticks - NOTE: all queries are optional
 * @query *language*
 * @query *sort*
-* @query *from*
-* @query *to*
+* @query *skip* (pagination)
+* @query *limit* (pagination)
 
 
 GET breadstick/:id

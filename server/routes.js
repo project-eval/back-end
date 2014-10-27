@@ -9,23 +9,23 @@ module.exports = function (server) {
 
 	/*
 	 * @route
-	 * @description serves client
+	 * serves client
 	 */
 	server.route({
-	 	method: 'GET',
-	 	path: '/{param*}',
-	     handler: {
-	         directory: {
-	             path: 'front-end/build',
-	             listing: true,
-	             index: true
-	         },
-	     }
+		method: 'GET',
+		path: '/{param*}',
+		handler: {
+			directory: {
+				path: 'front-end/build',
+				listing: true,
+				index: true
+			},
+		}
 	})
 
 	/*
 	 * @route
-	 * account registration
+	 * register a new account
 	 */
 	server.route({
 		method: 'POST',
@@ -38,17 +38,18 @@ module.exports = function (server) {
 			if(!validator.isLength(username, 4, 20)) {
 				return reply({error: 'invalid username length'})
 			}
-
 			if(!validator.isLength(password, 8, 100)) {
 				return reply({error: 'invalid password length'})
+			}
+			if(!validator.isAlphanumeric(username)) {
+				return reply({error: 'username can only contain alphanumeric characters'})
 			}
 
 			User.findOne({username: username}, function (err, user) {
 				if(err) throw err
 
 				else if(user) {
-					reply({error: 'username already registered'})
-					return
+					return reply({error: 'username already registered'})
 				}
 
 				else {
@@ -62,18 +63,18 @@ module.exports = function (server) {
 						else if(user) {
 							request.auth.session.clear()
 							request.auth.session.set(user)
-							reply({success: {bitMask: user.bitMask, username: user.username}})
+							return reply({success: {role: user.role, username: user.username}})
 						}
 
 						else {
-							reply({error: unknown})
+							return reply({error: unknown})
 						}
 					})
 				}
 			})
 		}
 	})
-	
+
 	/*
 	 * @route
 	 * recive info about your session
@@ -83,21 +84,19 @@ module.exports = function (server) {
 		path: '/api/me',
 		handler: function (request, reply) {
 
-			if(!request.auth.isAuthenticated) {
-				reply({
-		      		username: 'o',
-		      		role: 'public'
-		    	})
-				return
+			if(request.auth.isAuthenticated) {
+				return reply({
+				  username: request.auth.credentials.username,
+				  role: request.auth.credentials.role
+				})
 			}
 
 			else {
-				reply({
-			      username: request.auth.credentials.username,
-			      role: request.auth.credentials.role
-			    })
-			    return
-		   	}
+				return reply({
+					username: '',
+					role: 'public'
+				})
+			}
 		}
 	})
 
@@ -113,13 +112,7 @@ module.exports = function (server) {
 			var username = request.payload.username
 			var password = request.payload.password
 
-			if(!validator.isLength(username, 4, 20)) {
-				return reply({error: 'invalid username length'})
-			}
-
-			if(!validator.isLength(password, 8, 100)) {
-				return reply({error: 'invalid password length'})
-			}
+			if(!username || !password) return reply({error: 'missing username or password field'})
 
 			User.findOne({username: username}, function (err, user) {
 				if(err) throw err
@@ -149,8 +142,12 @@ module.exports = function (server) {
 		method: 'POST',
 		path: '/api/logout',
 		handler: function (request, reply) {
-			if(request.auth.session) request.auth.session.clear()
-			reply({success: 'asd'})
+			
+			if(request.auth.session) {
+				request.auth.session.clear()
+			}
+
+			reply({success: true})
 		}
 	})
 
@@ -187,30 +184,40 @@ module.exports = function (server) {
 	/*
 	 * @route
 	 * query db for breadsticks
-	 *
-	 * @TODO add query count limit
-	 * @TODO refactor...
 	 */
 	server.route({
 		method: 'GET',
 		path: '/api/breadsticks',
 		handler: function (request, reply) {
 
+			// parsed query string
 			var query = request.query
+			var dbquery = BreadStick.find()
 
-			var q = BreadStick.find()
+			if(query.author) dbquery.where('author').equals(query.author)
+			if(query.language) dbquery.where('language').equals(query.language)
+			if(query.sort) dbquery.sort(query.sort)
 
-			if(query.author) q.where('author').equals(query.author)
-			if(query.language) q.where('language').equals(query.language)
-			if(query.sort) q.sort(query.sort)
+			var skip = query.skip || 0
+			var limit = query.limit ? clamp(query.limit, 1, 100) : 50
 
-			q.skip(query.from || 0)
-			q.limit(query.to || 10)
+			dbquery.skip(skip)
+			dbquery.limit(limit)
 
-			q.exec(function (err, breadSticks) {
+			dbquery.exec(function (err, breadSticks) {
 				if(err) throw err
-				else reply(breadSticks)
+
+				else if(breadSticks) {
+					return reply(breadSticks)
+				}
+
+				else {
+					reply({error: 'unknown'})
+				}
 			})
+
+			// no clamp on lodash?
+			function clamp(num, min, max) {return Math.min(Math.max(num, min), max)}
 		}
 	})
 
@@ -245,12 +252,12 @@ module.exports = function (server) {
 
 	/*
 	 * @route
-	 * submit code to eval
+	 * submit code for evaluation
 	 */
 	server.route({
 		method: 'POST',
 		path: '/api/breadstick/{id}',
-		config: {auth: 'simple'},
+		config: {auth: 'local'},
 		handler: function (request, reply) {
 
 			var breadstick_id = request.params.id
@@ -284,12 +291,12 @@ module.exports = function (server) {
 
 	/*
 	 * @route
-	 * create breadstick
+	 * create a breadstick
 	 */
 	server.route({
 		method: 'POST',
 		path: '/api/breadsticks',
-		config: {auth: 'simple'},
+		config: {auth: 'local'},
 		handler: function (request, reply) {
 
 			var author = request.auth.credentials.username
@@ -333,7 +340,7 @@ module.exports = function (server) {
 	server.route({
 		method: 'PUT',
 		path: '/api/breadsticks',
-		config: {auth: 'simple'},
+		config: {auth: 'local'},
 		handler: function (request, reply) {
 
 			var id = request.payload.id

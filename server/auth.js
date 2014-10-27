@@ -4,7 +4,7 @@ module.exports = function (server) {
 	server.pack.register(require('hapi-auth-cookie'), function (err) {
 		if(err) console.log(err)
 
-	    server.auth.strategy('simple', 'cookie', 'try', {
+	    server.auth.strategy('local', 'cookie', 'try', {
 	        password : 'secret',
 	        cookie : 'olive-garden',
 	        redirectTo : false,
