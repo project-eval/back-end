@@ -29,6 +29,11 @@ POST logout
 terminate session
 
 
+GET me
+--------------
+get session information, role and username
+
+
 GET user/:username
 --------------
 returns public information about an user
@@ -36,11 +41,19 @@ returns public information about an user
 
 POST breadsticks
 --------------
-create a new breadstick
-* @param *source*
-* @param *language*
-* @param *difficulty*
-* @param *title*
+create a new empty breadstick (look at PUT breadsticks)
+
+
+PUT breadsticks
+--------------
+update a breadstick
+* @param *id* - id of the breadstick you wanna update
+* @param *update* - hash of params you wanna update
+* @param *update.challenges*
+* @param *update.language*
+* @param *update.tags*
+* @param *update.difficulty*
+* @param *update.name*
 
 
 GET breadsticks?
