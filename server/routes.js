@@ -5,6 +5,7 @@ var BreadStick = require('./models/breadstick')
 var Solution = require('./models/solution')
 var coderunner = require('./coderunner')
 var Q = require('q')
+var Joi = require('joi')
 
 module.exports = function (server) {
 
@@ -32,46 +33,48 @@ module.exports = function (server) {
 	server.route({
 		method: 'POST',
 		path: '/api/register',
+		config: {
+			validate: {
+				payload: {
+					username: Joi.string().required().alphanum().min(4).max(20),
+					password: Joi.string().required().min(8).max(100)
+				}
+			},
+			pre: [
+				{
+					method: function (request, reply) {
+						User.findOne({username: request.payload.username}, function (err, user) {
+							if(err) throw err
+							else if(user) return reply(user.username)
+							else return reply(null)
+						})
+					},
+					assign: 'username'
+				}
+			]
+		},
 		handler: function (request, reply) {
 
-			var username = request.payload.username
+			var username = request.pre.username
 			var password = request.payload.password
 
-			if(!validator.isLength(username, 4, 20)) {
-				return reply({error: 'invalid username length'})
-			}
-			if(!validator.isLength(password, 8, 100)) {
-				return reply({error: 'invalid password length'})
-			}
-			if(!validator.isAlphanumeric(username)) {
-				return reply({error: 'username can only contain alphanumeric characters'})
-			}
+			if(username) return reply({error: 'username is taken'})
 
-			User.findOne({username: username}, function (err, user) {
+			var newUser = new User()
+			newUser.username = username
+			newUser.password = newUser.generateHash(password)
+
+			newUser.save(function (err, user) {
 				if(err) throw err
 
 				else if(user) {
-					return reply({error: 'username already registered'})
+					request.auth.session.clear()
+					request.auth.session.set(user)
+					return reply({success: {role: user.role, username: user.username}})
 				}
 
 				else {
-					var newUser = new User()
-					newUser.username = username
-					newUser.password = newUser.generateHash(password)
-
-					newUser.save(function (err, user) {
-						if(err) throw err
-
-						else if(user) {
-							request.auth.session.clear()
-							request.auth.session.set(user)
-							return reply({success: {role: user.role, username: user.username}})
-						}
-
-						else {
-							return reply({error: unknown})
-						}
-					})
+					return reply({error: unknown})
 				}
 			})
 		}

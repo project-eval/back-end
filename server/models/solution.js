@@ -8,7 +8,7 @@ var SolutionSchema = mongoose.Schema({
 	// breadstick id
 	breadstick: {type: String, ref: 'BreadStick'},
 
-	// user id
+	// user username
 	user: {type: String, ref: 'User'},
 
 	// solution
