@@ -45,20 +45,20 @@ module.exports = function (server) {
 					method: function (request, reply) {
 						User.findOne({username: request.payload.username}, function (err, user) {
 							if(err) throw err
-							else if(user) return reply(user.username)
-							else return reply(null)
+							else if(user) return reply(true)
+							else return reply(false)
 						})
 					},
-					assign: 'username'
+					assign: 'usernameIsTaken'
 				}
 			]
 		},
 		handler: function (request, reply) {
 
-			var username = request.pre.username
-			var password = request.payload.password
+			if(request.pre.usernameIsTaken) return reply({error: 'username is taken'})
 
-			if(username) return reply({error: 'username is taken'})
+			var username = request.payload.username
+			var password = request.payload.password
 
 			var newUser = new User()
 			newUser.username = username
