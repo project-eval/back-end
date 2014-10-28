@@ -63,6 +63,14 @@ module.exports = function (server) {
 	server.route({
 		method: 'GET',
 		path: '/api/solutions',
+		config: {
+			validate: {
+				query: {
+					skip: Joi.number().min(0).default(0),
+					limit: Joi.number().min(1).max(100).default(50)
+				}
+			}
+		},
 		handler: function (request, reply) {
 
 			var query = request.query
@@ -71,27 +79,14 @@ module.exports = function (server) {
 			if(query.user) dbquery.where('user').equals(query.user)
 			if(query.breadstick) dbquery.where('breadstick').equals(query.breadstick)
 
-			var skip = query.skip || 0
-			var limit = query.limit ? clamp(query.limit, 1, 100) : 50
-
-			dbquery.skip(skip)
-			dbquery.limit(limit)
+			dbquery.skip(query.skip)
+			dbquery.limit(query.limit)
 
 			dbquery.exec(function (err, solutions) {
 				if(err) throw err
-
-				else if(solutions) {
-					return reply(solutions)
-				}
-
-				else {
-					return reply({error: 'not match found'})
-				}
+				else if(solutions) return reply(solutions)
+				else return reply({error: 'not match found'})
 			})
-
-			// no clamp on lodash?
-			function clamp(num, min, max) {return Math.min(Math.max(num, min), max)}
-
 		}
 	})
 
@@ -102,6 +97,14 @@ module.exports = function (server) {
 	server.route({
 		method: 'GET',
 		path: '/api/breadsticks',
+		config: {
+			validate: {
+				query: {
+					skip: Joi.number().min(0).default(0),
+					limit: Joi.number().min(1).max(100).default(50)
+				}
+			}
+		},
 		handler: function (request, reply) {
 
 			// parsed query string
@@ -112,26 +115,14 @@ module.exports = function (server) {
 			if(query.language) dbquery.where('language').equals(query.language)
 			if(query.sort) dbquery.sort(query.sort)
 
-			var skip = query.skip || 0
-			var limit = query.limit ? clamp(query.limit, 1, 100) : 50
-
-			dbquery.skip(skip)
-			dbquery.limit(limit)
+			dbquery.skip(query.skip)
+			dbquery.limit(query.limit)
 
 			dbquery.exec(function (err, breadSticks) {
 				if(err) throw err
-
-				else if(breadSticks) {
-					return reply(breadSticks)
-				}
-
-				else {
-					return reply({error: 'not match found'})
-				}
+				else if(breadSticks) return reply(breadSticks)
+				else return reply({error: 'not match found'})
 			})
-
-			// no clamp on lodash?
-			function clamp(num, min, max) {return Math.min(Math.max(num, min), max)}
 		}
 	})
 
@@ -171,7 +162,9 @@ module.exports = function (server) {
 	server.route({
 		method: 'POST',
 		path: '/api/breadstick/{id}/{index}',
-		config: {auth: 'local'},
+		config: {
+			auth: 'local'
+		},
 		handler: function (request, reply) {
 
 			var breadstick_id = request.params.id
@@ -237,7 +230,9 @@ module.exports = function (server) {
 	server.route({
 		method: 'POST',
 		path: '/api/breadsticks',
-		config: {auth: 'local'},
+		config: {
+			auth: 'local'
+		},
 		handler: function (request, reply) {
 
 			var author = request.auth.credentials.username
@@ -281,15 +276,21 @@ module.exports = function (server) {
 	server.route({
 		method: 'PUT',
 		path: '/api/breadsticks',
-		config: {auth: 'local'},
+		config: {
+			auth: 'local',
+			validate: {
+				payload: {
+					id: Joi.string().required(),
+					update: Joi.object().required()
+				}
+			}
+		},
 		handler: function (request, reply) {
 
 			var id = request.payload.id
 			var update = request.payload.update
 
-			delete update._id
-
-			if(!update || !id) return reply({error: 'missing params'})
+			if(update[_id]) delete update._id
 
 			BreadStick.findOneAndUpdate({'_id': id}, request.payload.update, function (err) {
 				if(err) throw err
