@@ -2,6 +2,7 @@ var _ = require('lodash')
 var validator = require('validator')
 var User = require('./models/user')
 var BreadStick = require('./models/breadstick')
+var Solution = require('./models/solution')
 var coderunner = require('./coderunner')
 var Q = require('q')
 
@@ -257,13 +258,18 @@ module.exports = function (server) {
 	 */
 	server.route({
 		method: 'POST',
-		path: '/api/breadstick/{id}',
+		path: '/api/breadstick/{id}/{index}',
 		config: {auth: 'local'},
 		handler: function (request, reply) {
 
 			var breadstick_id = request.params.id
-			var user_id = request.auth.credentials._id
+			var challenge_index = request.params.index
 			var code = request.payload.code
+			var user_id = request.auth.credentials._id
+
+			if(!breadstick_id || !challenge_index || !code) {
+				return reply({error: 'missing params'})
+			}
 
 			// $addToSet only pushes to array if item is unique
 			User.update({_id: user_id}, {$addToSet:{breadsticks:breadstick_id}}, function (err) {
@@ -271,6 +277,26 @@ module.exports = function (server) {
 			})
 			BreadStick.update({_id: breadstick_id}, {$addToSet:{users:user_id}}, function (err) {
 				if(err) throw err
+			})
+
+			// update solution at challenge_index
+			// create new solution container if it doesn't already exists
+			Solution.findOne({user: user_id, breadstick: breadstick_id}, function (err, solution) {
+				if(err) throw err
+
+				else if(solution) {
+					solution.solution[challenge_index] = code
+					Solution.findOneAndUpdate({user: user_id, breadstick: breadstick_id}, {'solution': solution.solution }, 
+					function (err) { if(err) throw err })
+				}
+
+				else {
+					var newSolution = new Solution({
+						user: user_id,
+						breadstick: breadstick_id,
+						solution: [][challenge_index] = code
+					}).save(function (err) { if(err) throw err })
+				}
 			})
 
 			BreadStick.findById(breadstick_id, function (err, breadstick) {

@@ -9,10 +9,10 @@ var SolutionSchema = mongoose.Schema({
 	breadstick: {type: String, ref: 'BreadStick'},
 
 	// user id
-	user: {type: String},
+	user: {type: String, ref: 'User'},
 
 	// solution
-	solution: [{type: String, default: ''}]
+	solution: {type: Array, default: []}
 
 })
 
