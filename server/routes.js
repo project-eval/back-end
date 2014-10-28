@@ -185,6 +185,45 @@ module.exports = function (server) {
 
 	/*
 	 * @route
+	 * query db for solutions
+	 */
+	server.route({
+		method: 'GET',
+		path: '/api/solutions',
+		handler: function (request, reply) {
+
+			var query = request.query
+			var dbquery = Solution.find()
+
+			if(query.user) dbquery.where('user').equals(query.user)
+			if(query.breadstick) dbquery.where('breadstick').equals(query.breadstick)
+
+			var skip = query.skip || 0
+			var limit = query.limit ? clamp(query.limit, 1, 100) : 50
+
+			dbquery.skip(skip)
+			dbquery.limit(limit)
+
+			dbquery.exec(function (err, solutions) {
+				if(err) throw err
+
+				else if(solutions) {
+					return reply(solutions)
+				}
+
+				else {
+					return reply({error: 'not match found'})
+				}
+			})
+
+			// no clamp on lodash?
+			function clamp(num, min, max) {return Math.min(Math.max(num, min), max)}
+
+		}
+	})
+
+	/*
+	 * @route
 	 * query db for breadsticks
 	 */
 	server.route({
@@ -214,7 +253,7 @@ module.exports = function (server) {
 				}
 
 				else {
-					reply({error: 'unknown'})
+					return reply({error: 'not match found'})
 				}
 			})
 
@@ -266,6 +305,7 @@ module.exports = function (server) {
 			var challenge_index = request.params.index
 			var code = request.payload.code
 			var user_id = request.auth.credentials._id
+			var username = request.auth.credentials.username
 
 			if(!breadstick_id || !challenge_index || !code) {
 				return reply({error: 'missing params'})
@@ -281,24 +321,25 @@ module.exports = function (server) {
 
 			// update solution at challenge_index
 			// create new solution container if it doesn't already exists
-			Solution.findOne({user: user_id, breadstick: breadstick_id}, function (err, solution) {
+			Solution.findOne({user: username, breadstick: breadstick_id}, function (err, solution) {
 				if(err) throw err
 
 				else if(solution) {
 					solution.solution[challenge_index] = code
-					Solution.findOneAndUpdate({user: user_id, breadstick: breadstick_id}, {'solution': solution.solution }, 
+					Solution.findOneAndUpdate({user: username, breadstick: breadstick_id}, {'solution': solution.solution }, 
 					function (err) { if(err) throw err })
 				}
 
 				else {
 					var newSolution = new Solution({
-						user: user_id,
+						user: username,
 						breadstick: breadstick_id,
 						solution: [][challenge_index] = code
 					}).save(function (err) { if(err) throw err })
 				}
 			})
 
+			// test code
 			BreadStick.findById(breadstick_id, function (err, breadstick) {
 				if(err) throw err
 
