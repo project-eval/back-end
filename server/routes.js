@@ -16,7 +16,11 @@ module.exports = function (server) {
 		method: 'GET',
 		path: '/{path*}',
 		handler: {
-			file: 'index.html'
+			directory: {
+				path: './',
+				listing: true,
+				index: true
+			},
 		}
 	})
 
