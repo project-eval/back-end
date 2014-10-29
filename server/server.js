@@ -15,7 +15,6 @@ require('./db')
 require('./auth')(server)
 
 // import routes
-require('./auth.routes')(server)
 require('./routes')(server)
 
 // logger
