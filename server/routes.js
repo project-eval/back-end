@@ -67,7 +67,10 @@ module.exports = function (server) {
 			validate: {
 				query: {
 					skip: Joi.number().min(0).default(0),
-					limit: Joi.number().min(1).max(100).default(50)
+					limit: Joi.number().min(1).max(100).default(50),
+					user: Joi.string(),
+					breadstick: Joi.string(),
+					sort: Joi.string()
 				}
 			}
 		},
@@ -78,6 +81,7 @@ module.exports = function (server) {
 
 			if(query.user) dbquery.where('user').equals(query.user)
 			if(query.breadstick) dbquery.where('breadstick').equals(query.breadstick)
+			if(query.sort) dbquery.sort(query.sort)
 
 			dbquery.skip(query.skip)
 			dbquery.limit(query.limit)
@@ -101,7 +105,10 @@ module.exports = function (server) {
 			validate: {
 				query: {
 					skip: Joi.number().min(0).default(0),
-					limit: Joi.number().min(1).max(100).default(50)
+					limit: Joi.number().min(1).max(100).default(50),
+					sort: Joi.string(),
+					author: Joi.string(),
+					language: Joi.string()
 				}
 			}
 		},
