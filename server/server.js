@@ -2,9 +2,15 @@ var Hapi = require('hapi')
 var Path = require('path')
 
 var server = Hapi.createServer('0.0.0.0', 9000, {
-	cors: true,
+	cors: {
+		origin: ['http://localhost:3000', 'http://0.0.0.0:3000'],
+		credentials: true
+	},
 	files: {
 		relativeTo: Path.join(__dirname, '../front-end/build')
+	},
+	debug: {
+		request: ['*']
 	}
 })
 
