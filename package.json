@@ -10,7 +10,7 @@
   },
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon index.js"
+    "dev": "./node_modules/.bin/nodemon index.js"
   },
   "dependencies": {
     "bcrypt": "^0.8.0",
@@ -24,5 +24,7 @@
     "sandbox": "^0.8.6",
     "validator": "^3.22.0"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "nodemon": "^1.2.1"
+  }
 }
