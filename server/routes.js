@@ -1,3 +1,4 @@
+var codeRunner = require('./coderunner')
 
 /*
  * import all routes
@@ -26,6 +27,17 @@ module.exports = function (server) {
 				listing: true,
 				index: true
 			},
+		}
+	})
+
+	server.route({
+		method: 'POST',
+		path: '/api/coderunner',
+		handler: function (request, reply) {
+			codeRunner('javascript', '', request.payload.code, function (err, result) {
+				if(err) reply(err)
+				else reply(result)
+			})
 		}
 	})
 

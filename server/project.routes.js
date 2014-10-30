@@ -80,6 +80,7 @@ module.exports = function (server) {
 	/*
 	 * @route
 	 * submit code for evaluation
+	 * @TODO refactor
 	 */
 	server.route({
 		method: 'POST',
@@ -132,7 +133,10 @@ module.exports = function (server) {
 				if(err) throw err
 
 				else if(breadstick) {
-					coderunner(breadstick.language, code, function (err, output) {
+
+					var test = breadstick.challenges[challenge_index]
+
+					coderunner(breadstick.language, test, code, function (err, output) {
 						if(err) return reply({error: err})
 						else return reply(output)
 					})
