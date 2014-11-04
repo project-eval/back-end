@@ -21,7 +21,7 @@ require('./db')
 require('./auth')(server)
 
 // import routes
-require('./routes')(server)
+require('./routes/routes')(server)
 
 // logger
 server.ext('onRequest', function (request, next) {
