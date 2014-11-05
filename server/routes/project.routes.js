@@ -224,4 +224,29 @@ module.exports = function (server) {
 			})
 		}
 	})
+
+	/*
+	 * @route
+	 * delete breadstick
+	 */
+	server.route({
+		method: 'DELETE',
+		path: '/api/breadsticks/{id}',
+		config: {
+			auth: 'local'
+		}
+		handler: function (request, reply) {
+
+			var id = request.params.id
+
+			BreadStick.findOneAndUpdate({'_id': id}, {status: 4}, function (err) {
+				if(err) throw err
+
+				else {
+					reply({success: 'woooo'})
+				}
+			})
+
+		}
+	})
 }

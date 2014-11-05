@@ -25,6 +25,7 @@ var BreadStickSchema = mongoose.Schema({
 	// 1 = submittited for review
 	// 2 = aproved
 	// 3 = disaproved
+	// 4 = removed by user
 	// 9 = banned
 	status:     {type: Number, default: 0},
 
