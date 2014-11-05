@@ -70,6 +70,13 @@ GET breadstick/:id
 get a breadstick by id - includes ALL info about breadstick
 
 
-POST breadstick/:id
+POST breadstick/:id/:index
 -------------
 submit code to evaluation
+* @param *id* = project id
+* @param *index* = challenge index (within project)
+
+
+DELETE breadstick/:id
+-------------
+delete breadstick
