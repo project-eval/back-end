@@ -238,12 +238,30 @@ module.exports = function (server) {
 		handler: function (request, reply) {
 
 			var id = request.params.id
+			var username = request.auth.credentials.username
 
-			BreadStick.findOneAndUpdate({'_id': id}, {status: 4}, function (err) {
+			BreadStick.findById(id, function (err, breadstick) {
 				if(err) throw err
 
+				else if (breadstick) {
+
+					if(breadStick.author === username) {
+						BreadStick.findOneAndUpdate({'_id': id}, {status: 4}, function (err) {
+							if(err) throw err
+
+							else {
+								reply({success: 'project deleted'})
+							}
+						})
+					}
+
+					else {
+						reply({error: 'only author can delete a project'})
+					}
+				}
+
 				else {
-					reply({success: 'woooo'})
+					reply({error: 'project does not exist'})
 				}
 			})
 
